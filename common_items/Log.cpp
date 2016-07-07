@@ -26,8 +26,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#ifdef _WIN32
 #include <Windows.h>
-
+#endif
+#ifdef __unix__
+typedef int errno_t;
+#endif
 
 
 Log::Log(LogLevel level)
@@ -56,6 +60,7 @@ void Log::WriteToConsole(LogLevel level, const std::string& logMessage)
 		return;
 	}
 
+#ifdef _WIN32
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);	// a handle to the console window
 	if (console != INVALID_HANDLE_VALUE)
 	{
@@ -92,6 +97,23 @@ void Log::WriteToConsole(LogLevel level, const std::string& logMessage)
 			return;
 		}
 	}
+#endif // _WIN32
+#ifdef __unix__
+	switch (level)
+	{
+		case LogLevel::Error:
+			std::cout << "\033[31m" << logMessage << "\033[0m";
+			break;
+		case LogLevel::Warning:
+			std::cout << "\033[32m" << logMessage << "\033[0m";
+			break;
+		case LogLevel::Info:
+		case LogLevel::Debug:
+			std::cout << "\033[34m" << logMessage << "\033[0m";
+			break;
+	}
+	return;
+#endif // __unix__
 
 	std::cout << logMessage;
 }
@@ -103,7 +125,12 @@ void Log::WriteToFile(LogLevel level, const std::string& logMessage)
 	time_t rawtime;	// the raw time data
 	time(&rawtime);
 	tm timeInfo;		// the processed time data
+#ifdef _WIN32
 	errno_t error = localtime_s(&timeInfo, &rawtime);	// wheter or not there was an error
+#endif
+#ifdef __unix__
+	tm * error = localtime_r(&rawtime, &timeInfo);
+#endif
 	if (error == 0)
 	{
 		char timeBuffer[64];	// the formatted time

@@ -221,6 +221,11 @@ bool date::isSet() const
 string date::toString() const
 {
 	char buf[16];	// a buffer to temporarily hold the formatted string
+#ifdef _WIN32
 	sprintf_s(buf, 16, "%d.%d.%d", year, month, day);
+#endif
+#ifdef __unix__
+	snprintf(buf, 16, "%d.%d.%d", year, month, day);
+#endif
 	return string(buf);
 }

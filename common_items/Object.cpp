@@ -404,7 +404,12 @@ void setInt(string name, const int val, Object* branch)
 		br = branch;
 	}
 	static char strbuffer[1000];	// the text to add to the branch
+#ifdef _WIN32
 	sprintf_s(strbuffer, 1000, "%i", val);
+#endif
+#ifdef __unix__
+	snprintf(strbuffer, 1000, "%i", val);
+#endif
 	Object* b = new Object(name);	// the new object to add to the branch
 	b->setValue(strbuffer);
 	br->setValue(b);
@@ -418,7 +423,12 @@ void setFlt(string name, const double val, Object* branch)
 		br = branch;
 	}
 	static char strbuffer[1000];	// the text to add to the branch
+#ifdef _WIN32
 	sprintf_s(strbuffer, 1000, "%.3f", val);
+#endif
+#ifdef __unix__
+	snprintf(strbuffer, 1000, "%.3f", val);
+#endif
 	Object* b = new Object(name);	// the new object to add to the branch
 	b->setValue(strbuffer);
 	br->setValue(b);
