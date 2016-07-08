@@ -22,13 +22,20 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 
 #include "V2World.h"
+#ifdef _WIN32
 #include <Windows.h>
+#endif
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
 #include <regex>
+#ifdef _WIN32
 #include <io.h>
+#endif
+#ifdef __unix__
+#include "findfirst.h"
+#endif
 #include <list>
 #include <queue>
 #include <cmath>
@@ -142,8 +149,14 @@ V2World::V2World(const minorityPopMapping& minorities)
 	}
 
 	// Get province names
+#ifdef _WIN32
 	struct _stat st;
 	if (_stat(".\\blankMod\\output\\localisation\\text.csv", &st) == 0)
+#endif
+#ifdef __unix__
+	struct stat st;
+	if (stat("./blankMod/output/localisation/text.csv", &st) == 0)
+#endif
 	{
 		getProvinceLocalizations(".\\blankMod\\output\\localisation\\text.csv");
 	}
@@ -301,7 +314,12 @@ V2World::V2World(const minorityPopMapping& minorities)
 	dynamicCountries.clear();
 	const date FirstStartDate("1836.1.1");
 	ifstream V2CountriesInput;
+#ifdef _WIN32
 	if (_stat(".\\blankMod\\output\\common\\countries.txt", &st) == 0)
+#endif
+#ifdef __unix__
+	if (stat("./blankMod/output/common/countries.txt", &st) == 0)
+#endif
 	{
 		V2CountriesInput.open(".\\blankMod\\output\\common\\countries.txt");
 	}
@@ -340,7 +358,12 @@ V2World::V2World(const minorityPopMapping& minorities)
 		countryFileName	= line.substr(start, size);
 
 		Object* countryData;
+#ifdef _WIN32
 		if (_stat((string(".\\blankMod\\output\\common\\countries\\") + countryFileName).c_str(), &st) == 0)
+#endif
+#ifdef __unix__
+		if (stat((string("./blankMod/output/common/coutries/") + countryFileName).c_str(), &st) == 0)
+#endif
 		{
 			countryData = doParseFile((string(".\\blankMod\\output\\common\\countries\\") + countryFileName).c_str());
 			if (countryData == NULL)
@@ -348,7 +371,12 @@ V2World::V2World(const minorityPopMapping& minorities)
 				LOG(LogLevel::Warning) << "Could not parse file .\\blankMod\\output\\common\\countries\\" << countryFileName;
 			}
 		}
+#ifdef _WIN32
 		else if (_stat((Configuration::getV2Path() + "\\common\\countries\\" + countryFileName).c_str(), &st) == 0)
+#endif
+#ifdef __unix__
+		else if (stat((Configuration::getV2Path() + "/common/countries/" + countryFileName).c_str(), &st) == 0)
+#endif
 		{
 			countryData = doParseFile((Configuration::getV2Path() + "\\common\\countries\\" + countryFileName).c_str());
 			if (countryData == NULL)
@@ -399,7 +427,12 @@ void V2World::output() const
 	// Output common\countries.txt
 	LOG(LogLevel::Debug) << "Writing countries file";
 	FILE* allCountriesFile;
+#ifdef _WIN32
 	if (fopen_s(&allCountriesFile, ("Output\\" + Configuration::getOutputName() + "\\common\\countries.txt").c_str(), "w") != 0)
+#endif
+#ifdef __unix__
+	if ((allCountriesFile = fopen(("Output/" + Configuration::getOutputName() + "/common/countries.txt").c_str(), "w")) != 0)
+#endif
 	{
 		LOG(LogLevel::Error) << "Could not create countries file";
 		exit(-1);
@@ -466,7 +499,12 @@ void V2World::output() const
 		// ...and also empty out 0_Names.csv
 		FILE* zeronamesfile;
 		string zeronamesfilepath = localisationPath + "\\0_Names.csv";
+#ifdef _WIN32
 		if (fopen_s(&zeronamesfile, zeronamesfilepath.c_str(), "w") != 0)
+#endif
+#ifdef __unix__
+		if ((zeronamesfile = fopen(zeronamesfilepath.c_str(), "w")) != 0)
+#endif
 			fclose(zeronamesfile);
 
 	}
@@ -476,7 +514,12 @@ void V2World::output() const
 	}
 
 	FILE* localisationFile;
+#ifdef _WIN32
 	if (fopen_s(&localisationFile, (localisationPath + "\\0_Names.csv").c_str(), "a") != 0)
+#endif
+#ifdef __unix__
+	if ((localisationFile = fopen((localisationPath + "/0_Names.csv").c_str(), "a")) != 0)
+#endif
 	{
 		LOG(LogLevel::Error) << "Could not update localisation text file";
 		exit(-1);
@@ -535,11 +578,22 @@ void V2World::output() const
 		int size				= line.find_last_of('\"') - start - 1;
 		countryFileName	= line.substr(start + 1, size);
 
+#ifdef WIN32_
 		struct _stat st;
 		if (_stat(("Output\\" + Configuration::getOutputName() + "\\common\\countries\\" + countryFileName).c_str(), &st) == 0)
+#endif
+#ifdef __unix__
+		struct stat st;
+		if (stat(("Output/" + Configuration::getOutputName() + "/common/countries/" + countryFileName).c_str(), &st) == 0)
+#endif
 		{
 		}
+#ifdef _WIN32
 		else if (_stat((Configuration::getV2Path() + "\\common\\countries\\" + countryFileName).c_str(), &st) == 0)
+#endif
+#ifdef __unix__
+		else if (stat((Configuration::getV2Path() + "/common/countries/" + countryFileName).c_str(), &st) == 0)
+#endif
 		{
 		}
 		else
@@ -558,7 +612,12 @@ void V2World::outputPops() const
 	for (map<string, list<int>* >::const_iterator itr = popRegions.begin(); itr != popRegions.end(); itr++)
 	{
 		FILE* popsFile;
+#ifdef _WIN32
 		if (fopen_s(&popsFile, ("Output\\" + Configuration::getOutputName() + "\\history\\pops\\1836.1.1\\" + itr->first).c_str(), "w") != 0)
+#endif
+#ifdef __unix__
+		if ((popsFile = fopen(("Output/" + Configuration::getOutputName() + "/history/pops/1836.1.1/" + itr->first).c_str(), "w")) != 0)
+#endif
 		{
 			LOG(LogLevel::Error) << "Could not create pops file Output\\" << Configuration::getOutputName() << "\\history\\pops\\1836.1.1\\" << itr->first;
 			exit(-1);
@@ -1019,7 +1078,7 @@ void V2World::convertProvinces(const EU4World& sourceWorld, const provinceMappin
 }
 
 
-vector<V2Demographic> V2World::determineDemographics(vector<EU4PopRatio>& popRatios, EU4Province* eProv, V2Province* vProv, EU4Country* oldOwner, const cultureMapping& cultureMap, const cultureMapping& slaveCultureMap, const religionMapping& religionMap, const EU4RegionsMapping& regionsMap, int destNum, double provPopRatio)
+vector<V2Demographic> V2World::determineDemographics(const vector<EU4PopRatio>& popRatios, EU4Province* eProv, V2Province* vProv, EU4Country* oldOwner, const cultureMapping& cultureMap, const cultureMapping& slaveCultureMap, const religionMapping& religionMap, const EU4RegionsMapping& regionsMap, int destNum, double provPopRatio)
 {
 	vector<V2Demographic> demographics;
 	for (auto prItr: popRatios)

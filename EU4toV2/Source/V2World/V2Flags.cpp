@@ -30,12 +30,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include <boost/algorithm/string/predicate.hpp>
 
-#include "..\EU4World\EU4Country.h"
+#include "../EU4World/EU4Country.h"
 #include "V2Country.h"
-#include "..\Configuration.h"
+#include "../Configuration.h"
 #include "Log.h"
-#include "..\WinUtils.h"
-#include "..\FlagUtils.h"
+#include "../WinUtils.h"
+#include "../FlagUtils.h"
 
 const std::vector<std::string> V2Flags::flagFileSuffixes = { ".tga", "_communist.tga", "_fascist.tga", "_monarchy.tga", "_republic.tga" };
 

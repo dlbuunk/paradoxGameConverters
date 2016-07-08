@@ -67,7 +67,7 @@ class V2World {
 		map<string, V2Country*>	getDynamicCountries()	const;
 
 	private:
-		vector<V2Demographic>	determineDemographics(vector<EU4PopRatio>& popRatios, EU4Province* eProv, V2Province* vProv, EU4Country* oldOwner, const cultureMapping& cultureMap, const cultureMapping& slaveCultureMap, const religionMapping& religionMap, const EU4RegionsMapping& regionsMap, int destNum, double provPopRatio);
+		vector<V2Demographic>	determineDemographics(const vector<EU4PopRatio>& popRatios, EU4Province* eProv, V2Province* vProv, EU4Country* oldOwner, const cultureMapping& cultureMap, const cultureMapping& slaveCultureMap, const religionMapping& religionMap, const EU4RegionsMapping& regionsMap, int destNum, double provPopRatio);
 
 		void				outputPops() const;
 		void				getProvinceLocalizations(string file);

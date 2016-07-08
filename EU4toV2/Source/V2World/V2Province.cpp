@@ -36,6 +36,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 #include <sys/stat.h>
 using namespace std;
 
+#ifdef __unix__
+#define fprintf_s fprintf
+#endif
+
 
 
 V2Province::V2Province(string _filename)
@@ -83,8 +87,14 @@ V2Province::V2Province(string _filename)
 	num				= atoi(temp.c_str());
 
 	Object* obj;
+#ifdef _WIN32
 	struct _stat st;
 	if (_stat((string(".\\blankMod\\output\\history\\provinces") + _filename).c_str(), &st) == 0)
+#endif
+#ifdef __unix__
+	struct stat st;
+	if (stat((string("./blankMod/output/history/provinces") + _filename).c_str(), &st) == 0)
+#endif
 	{
 		obj = doParseFile((string(".\\blankMod\\output\\history\\provinces") + _filename).c_str());
 		if (obj == NULL)
@@ -173,6 +183,7 @@ V2Province::V2Province(string _filename)
 void V2Province::output() const
 {
 	FILE* output;
+#ifdef _WIN32
 	if (fopen_s(&output, ("Output\\" + Configuration::getOutputName() + "\\history\\provinces\\" + filename).c_str(), "w") != 0)
 	{
 		int errNum;
@@ -182,6 +193,14 @@ void V2Province::output() const
 		LOG(LogLevel::Error) << "Could not create province history file Output\\" << Configuration::getOutputName() << "\\history\\provinces\\" << filename << " - " << errStr;
 		exit(-1);
 	}
+#endif // _WIN32
+#ifdef __unix__
+	if ((output = fopen(("Output/" + Configuration::getOutputName() + "/history/provinces/" + filename).c_str(), "w")) != 0)
+	{
+		LOG(LogLevel::Error) << "Could not create province history file Output\\" << Configuration::getOutputName() << "\\history\\provinces\\" << filename;
+		exit(-1);
+	}
+#endif // __unix__
 	if (owner != "")
 	{
 		fprintf_s(output, "owner=%s\n", owner.c_str());

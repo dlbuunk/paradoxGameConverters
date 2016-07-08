@@ -25,16 +25,21 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 #include <algorithm>
 #include <math.h>
 #include <float.h>
+#ifdef _WIN32
 #include <io.h>
+#endif
+#ifdef __unix__
+#include "findfirst.h"
+#endif
 #include <fstream>
 #include <sstream>
 #include <queue>
 #include <boost/algorithm/string.hpp>
 #include "Log.h"
 #include "../Configuration.h"
-#include "paradoxParser.h"
+#include "ParadoxParser.h"
 #include "../EU4World/EU4World.h"
-#include "../EU4World/Eu4Country.h"
+#include "../EU4World/EU4Country.h"
 #include "../EU4World/EU4Province.h"
 #include "../EU4World/EU4Relations.h"
 #include "../EU4World/EU4Leader.h"
@@ -165,7 +170,12 @@ void V2Country::output() const
 	if(!dynamicCountry)
 	{
 		FILE* output;
+#ifdef _WIN32
 		if (fopen_s(&output, ("Output\\" + Configuration::getOutputName() + "\\history\\countries\\" + filename).c_str(), "w") != 0)
+#endif
+#ifdef __unix__	
+		if ((output = fopen(("Output/" + Configuration::getOutputName() + "/history/countries/" + filename).c_str(), "w")) != 0)
+#endif
 		{
 			LOG(LogLevel::Error) << "Could not create country history file " << filename;
 			exit(-1);
@@ -354,7 +364,12 @@ void V2Country::outputElection(FILE* output) const
 void V2Country::outputOOB() const
 {
 	FILE* output;
+#ifdef _WIN32
 	if (fopen_s(&output, ("Output\\" + Configuration::getOutputName() + "\\history\\units\\" + tag + "_OOB.txt").c_str(), "w") != 0)
+#endif
+#ifdef __unix__
+	if ((output = fopen(("Output/" + Configuration::getOutputName() + "/history/units/" + tag + "_OOB.txt").c_str(), "w")) != 0)
+#endif
 	{
 		LOG(LogLevel::Error) << "Could not create OOB file " << (tag + "_OOB.txt");
 		exit(-1);

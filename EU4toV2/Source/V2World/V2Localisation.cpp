@@ -23,11 +23,16 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include "V2Localisation.h"
 
+#ifdef _WIN32
 #include <Windows.h>
+#endif
+#ifdef __unix__
+#include <algorithm>
+#endif
 
-#include "..\EU4World\EU4Country.h"
+#include "../EU4World/EU4Country.h"
 #include "Log.h"
-#include "..\WinUtils.h"
+#include "../WinUtils.h"
 
 const std::array<std::string, V2Localisation::numLanguages> V2Localisation::languages = 
 	{ "english", "french", "german", "spanish" };
@@ -64,11 +69,19 @@ void V2Localisation::SetPartyName(size_t partyIndex, const std::string& language
 	{
 		parties.resize(partyIndex + 1);
 	}
-	auto languageIter = std::find(languages.begin(), languages.end(), language);
-	if (languageIter != languages.end())
+//	auto languageIter = std::find(std::begin(languages), std::end(languages), language);
+//	if (languageIter != languages.end())
+//	{
+//		size_t languageIndex = std::distance(languages.begin(), languageIter);
+//		parties[partyIndex].name[languageIndex] = name;
+//	}
+	for (size_t i = 0; i < numLanguages; ++i)
 	{
-		size_t languageIndex = std::distance(languages.begin(), languageIter);
-		parties[partyIndex].name[languageIndex] = name;
+		if (languages[i] == language)
+		{
+			parties[partyIndex].name[i] = name;
+			return;
+		}
 	}
 }
 
@@ -106,6 +119,7 @@ std::string V2Localisation::convertCountryFileName(const std::string countryFile
 
 std::string V2Localisation::Convert(const std::string& text)
 {
+#ifdef _WIN32
 	if (text.empty())
 	{
 		return "";
@@ -138,6 +152,11 @@ std::string V2Localisation::Convert(const std::string& text)
 		return "";
 	}
 	return std::string(latin1Text.begin(), latin1Text.end());
+#endif // _WIN32
+#ifdef __unix__
+	//TODO: figure out what the windows code does and replicate that
+	return text;
+#endif // __unix__
 }
 
 std::string V2Localisation::GetLocalName()
