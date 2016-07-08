@@ -148,7 +148,7 @@ typedef map<string, shared_ptr<CustomFlag> > customFlagset; // <name, flag>
 
 // CK2 titles for flags
 typedef struct {
-	map<string, string> map; // <name, title>
+	map<string, string> ntmap; // <name, title>
 	vector<string> islamFlags;
 	vector<string> indiaFlags;
 } CK2TitleMapping;	

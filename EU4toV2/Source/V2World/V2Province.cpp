@@ -96,19 +96,19 @@ V2Province::V2Province(string _filename)
 	if (stat((string("./blankMod/output/history/provinces") + _filename).c_str(), &st) == 0)
 #endif
 	{
-		obj = doParseFile((string(".\\blankMod\\output\\history\\provinces") + _filename).c_str());
+		obj = doParseFile((string("./blankMod/output/history/provinces") + _filename).c_str());
 		if (obj == NULL)
 		{
-			LOG(LogLevel::Error) << "Could not parse .\\blankMod\\output\\history\\provinces" << _filename;
+			LOG(LogLevel::Error) << "Could not parse ./blankMod/output/history/provinces" << _filename;
 			exit(-1);
 		}
 	}
 	else
 	{
-		obj = doParseFile((Configuration::getV2Path() + "\\history\\provinces" + _filename).c_str());
+		obj = doParseFile((Configuration::getV2Path() + "/history/provinces" + _filename).c_str());
 		if (obj == NULL)
 		{
-			LOG(LogLevel::Error) << "Could not parse " << Configuration::getV2Path() << "\\history\\provinces" << _filename;
+			LOG(LogLevel::Error) << "Could not parse " << Configuration::getV2Path() << "/history/provinces" << _filename;
 			exit(-1);
 		}
 	}
@@ -197,7 +197,7 @@ void V2Province::output() const
 #ifdef __unix__
 	if ((output = fopen(("Output/" + Configuration::getOutputName() + "/history/provinces/" + filename).c_str(), "w")) != 0)
 	{
-		LOG(LogLevel::Error) << "Could not create province history file Output\\" << Configuration::getOutputName() << "\\history\\provinces\\" << filename;
+		LOG(LogLevel::Error) << "Could not create province history file Output/" << Configuration::getOutputName() << "/history/provinces/" << filename;
 		exit(-1);
 	}
 #endif // __unix__

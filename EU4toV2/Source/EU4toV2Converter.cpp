@@ -169,9 +169,11 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 		for (set<string>::iterator itr = fileNames.begin(); itr != fileNames.end(); itr++)
 		{
 			const int pos = itr->find_last_of('.');	// the position of the last period in the filename
+			if (pos == string::npos)
+				continue;
 			if (itr->substr(pos, itr->length()) == ".mod")
 			{
-				Object* modObj = doParseFile((EU4DocumentsLoc + "\\mod\\" + *itr).c_str());	// the parsed mod file
+				Object* modObj = doParseFile((EU4DocumentsLoc + "/mod/" + *itr).c_str());	// the parsed mod file
 
 				string name;	// the name of the mod
 				vector<Object*> nameObj = modObj->getValue("name");
@@ -201,8 +203,8 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 
 				if ((name != "") && (path != ""))
 				{
-					possibleMods.insert(make_pair(name, EU4DocumentsLoc + "\\" + path));
-					Log(LogLevel::Debug) << "\t\tFound a mod named " << name << " claiming to be at " << EU4DocumentsLoc << "\\" << path;
+					possibleMods.insert(make_pair(name, EU4DocumentsLoc + "/" + path));
+					Log(LogLevel::Debug) << "\t\tFound a mod named " << name << " claiming to be at " << EU4DocumentsLoc << "/" << path;
 				}
 			}
 		}
@@ -228,9 +230,11 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 		for (set<string>::iterator itr = fileNames.begin(); itr != fileNames.end(); itr++)
 		{
 			const int pos = itr->find_last_of('.');	// the last period in the filename
-			if ((pos != string::npos) && (itr->substr(pos, itr->length()) == ".mod"))
+			if (pos == string::npos)
+				continue;
+			if (itr->substr(pos, itr->length()) == ".mod")
 			{
-				Object* modObj = doParseFile((CK2ExportLoc + "\\" + *itr).c_str());	// the parsed mod file
+				Object* modObj = doParseFile((CK2ExportLoc + "/" + *itr).c_str());	// the parsed mod file
 				vector<Object*> nameObj = modObj->getValue("name");
 				string name;
 				if (nameObj.size() > 0)
@@ -255,14 +259,15 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 
 				if (path != "")
 				{
-					possibleMods.insert(make_pair(name, CK2ExportLoc + "\\" + path));
+					possibleMods.insert(make_pair(name, CK2ExportLoc + "/" + path));
+					Log(LogLevel::Debug) << "\t\tFound an export named " << name << " claiming to be at " << CK2ExportLoc << "/" << path;
 				}
 			}
 		}
 	}
 
 	//get output name
-	const int slash	= EU4SaveFileName.find_last_of("\\");				// the last slash in the save's filename
+	const int slash	= EU4SaveFileName.find_last_of("/");				// the last slash in the save's filename
 	string outputName	= EU4SaveFileName.substr(slash + 1, EU4SaveFileName.length());
 	const int length	= outputName.find_first_of(".");						// the first period after the slash
 	outputName			= outputName.substr(0, length);						// the name to use to output the mod
@@ -281,7 +286,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	Configuration::setOutputName(outputName);
 	LOG(LogLevel::Info) << "Using output name " << outputName;
 
-	string outputFolder = string(curDir) + "\\output\\" + Configuration::getOutputName();
+	string outputFolder = string(curDir) + "/output/" + Configuration::getOutputName();
 	if (WinUtils::doesFolderExist(outputFolder.c_str()))
 	{
 		LOG(LogLevel::Error) << "Output folder " << Configuration::getOutputName() << " already exists! Clear the output folder before running again!";
@@ -369,7 +374,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	for (vector<string>::iterator itr = fullModPaths.begin(); itr != fullModPaths.end(); itr++)
 	{
 		LOG(LogLevel::Debug) << "Reading mod localisation";
-		localisation.ReadFromAllFilesInFolder(*itr + "\\localisation");
+		localisation.ReadFromAllFilesInFolder(*itr + "/localisation");
 	}
 
 	// Read Idea Effects
@@ -430,10 +435,10 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	// find culture groups
 	unionCulturesMap			unionCultures;
 	inverseUnionCulturesMap	inverseUnionCultures;
-	Object* culturesObj = doParseFile( (EU4Loc + "\\common\\cultures\\00_cultures.txt").c_str() );
+	Object* culturesObj = doParseFile( (EU4Loc + "/common/cultures/00_cultures.txt").c_str() );
 	if (culturesObj == NULL)
 	{
-		LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "\\common\\cultures\\00_cultures.txt";
+		LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "/common/cultures/00_cultures.txt";
 		exit(-1);
 	}
 	if (culturesObj->getLeaves().size() < 1)
@@ -446,7 +451,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	{
 		struct _finddata_t	fileData;				// the file data info
 		intptr_t					fileListing = NULL;	// the file listing info
-		if ((fileListing = _findfirst(string(*itr + "\\common\\cultures\\*").c_str(), &fileData)) != -1L)
+		if ((fileListing = _findfirst(string(*itr + "/common/cultures/*").c_str(), &fileData)) != -1L)
 		{
 			do
 			{
@@ -460,7 +465,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 				}
 				else
 				{
-					string modCultureFile(*itr + "\\common\\cultures\\" + fileData.name);	// the path and name of the culture file in this mod
+					string modCultureFile(*itr + "/common/cultures/" + fileData.name);	// the path and name of the culture file in this mod
 					culturesObj = doParseFile(modCultureFile.c_str());
 					if (culturesObj == NULL)
 					{
@@ -480,22 +485,23 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	sourceWorld.checkAllEU4CulturesMapped(cultureMap, inverseUnionCultures);
 
 	// Read EU4 common\countries
-	LOG(LogLevel::Info) << "Reading EU4 common\\countries";
+	LOG(LogLevel::Info) << "Reading EU4 common/countries";
 	{
-		ifstream commonCountries(Configuration::getEU4Path() + "\\common\\country_tags\\00_countries.txt");	// the data in the countries file
+		ifstream commonCountries(Configuration::getEU4Path() + "/common/country_tags/00_countries.txt");	// the data in the countries file
 		sourceWorld.readCommonCountries(commonCountries, Configuration::getEU4Path());
 		for (vector<string>::iterator itr = fullModPaths.begin(); itr != fullModPaths.end(); itr++)
 		{
 			set<string> fileNames;
-			WinUtils::GetAllFilesInFolder(*itr + "\\common\\country_tags\\", fileNames);
+			WinUtils::GetAllFilesInFolder(*itr + "/common/country_tags/", fileNames);
 			for (set<string>::iterator fileItr = fileNames.begin(); fileItr != fileNames.end(); fileItr++)
 			{
-				ifstream convertedCommonCountries(*itr + "\\common\\country_tags\\" + *fileItr);	// a stream of the data in the converted countries file
+				ifstream convertedCommonCountries(*itr + "/common/country_tags/" + *fileItr);	// a stream of the data in the converted countries file
 				sourceWorld.readCommonCountries(convertedCommonCountries, *itr);
 			}
 		}
 	}
 
+	cout << "SET LOCAL\n";
 	sourceWorld.setLocalisations(localisation);
 
 	// Resolve unit types
@@ -524,7 +530,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 		LOG(LogLevel::Info) << "\tReading unit strengths from EU4 installation folder";
 		struct _finddata_t unitFileData;
 		intptr_t fileListing;
-		if ( (fileListing = _findfirst( (EU4Loc + "\\common\\units\\*.txt").c_str(), &unitFileData)) == -1L)
+		if ( (fileListing = _findfirst( (EU4Loc + "/common/units/*.txt").c_str(), &unitFileData)) == -1L)
 		{
 			LOG(LogLevel::Error) << "Could not open units directory.";
 			return -1;
@@ -537,7 +543,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 			}
 			string unitFilename = unitFileData.name;
 			string unitName = unitFilename.substr(0, unitFilename.find_first_of('.'));
-			AddUnitFileToRegimentTypeMap((EU4Loc + "\\common\\units"), unitName, rtm);
+			AddUnitFileToRegimentTypeMap((EU4Loc + "/common/units"), unitName, rtm);
 		} while(_findnext(fileListing, &unitFileData) == 0);
 		_findclose(fileListing);
 	}
@@ -608,7 +614,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	continentMapping continentMap;
 	for (vector<string>::iterator itr = fullModPaths.begin(); itr != fullModPaths.end(); itr++)
 	{
-		string continentFile = *itr + "\\map\\continent.txt";	// the path and name of the continent file
+		string continentFile = *itr + "/map/continent.txt";	// the path and name of the continent file
 #ifdef _WIN32
 		if ((_stat(continentFile.c_str(), &st) == 0))
 #endif
@@ -625,10 +631,10 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	}
 	if (continentMap.size() == 0)
 	{
-		Object* continentObject = doParseFile((EU4Loc + "\\map\\continent.txt").c_str());
+		Object* continentObject = doParseFile((EU4Loc + "/map/continent.txt").c_str());
 		if (continentObject == NULL)
 		{
-			LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "\\map\\continent.txt";
+			LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "/map/continent.txt";
 			exit(-1);
 		}
 		if (continentObject->getLeaves().size() < 1)
@@ -653,19 +659,19 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	if (stat("./blankMod/output/map/region.txt", &st) == 0)
 #endif
 	{
-		Vic2RegionsObj = doParseFile(".\\blankMod\\output\\map\\region.txt");
+		Vic2RegionsObj = doParseFile("./blankMod/output/map/region.txt");
 		if (Vic2RegionsObj == NULL)
 		{
-			LOG(LogLevel::Error) << "Could not parse file .\\blankMod\\output\\map\\region.txt";
+			LOG(LogLevel::Error) << "Could not parse file ./blankMod/output/map/region.txt";
 			exit(-1);
 		}
 	}
 	else
 	{
-		Vic2RegionsObj = doParseFile( (V2Loc + "\\map\\region.txt").c_str() );
+		Vic2RegionsObj = doParseFile( (V2Loc + "/map/region.txt").c_str() );
 		if (Vic2RegionsObj == NULL)
 		{
-			LOG(LogLevel::Error) << "Could not parse file " << V2Loc << "\\map\\region.txt";
+			LOG(LogLevel::Error) << "Could not parse file " << V2Loc << "/map/region.txt";
 			exit(-1);
 		}
 	}
@@ -681,10 +687,10 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 
 	// Parse EU4 Religions
 	LOG(LogLevel::Info) << "Parsing EU4 religions";
-	Object* religionsObj = doParseFile((EU4Loc + "\\common\\religions\\00_religion.txt").c_str());
+	Object* religionsObj = doParseFile((EU4Loc + "/common/religions/00_religion.txt").c_str());
 	if (religionsObj == NULL)
 	{
-		LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "\\common\\religions\\00_religion.txt";
+		LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "/common/religions/00_religion.txt";
 		exit(-1);
 	}
 	if (religionsObj->getLeaves().size() < 1)
@@ -697,7 +703,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	{
 		struct _finddata_t	fileData;				// the file data info
 		intptr_t					fileListing = NULL;	// the file listing info
-		if ((fileListing = _findfirst(string(*itr + "\\common\\religions\\*").c_str(), &fileData)) != -1L)
+		if ((fileListing = _findfirst(string(*itr + "/common/religions/*").c_str(), &fileData)) != -1L)
 		{
 			do
 			{
@@ -711,7 +717,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 				}
 				else
 				{
-					string modReligionFile(*itr + "\\common\\religions\\" + fileData.name);	// the path and name of the religions file in this mod
+					string modReligionFile(*itr + "/common/religions/" + fileData.name);	// the path and name of the religions file in this mod
 #ifdef _WIN32
 					if ((_stat(modReligionFile.c_str(), &st) == 0))
 #endif
@@ -793,10 +799,10 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	vector<string> blockedTechSchools;	// the list of disallowed tech schools
 	blockedTechSchools = initBlockedTechSchools(techSchoolObj);
 	initParser();
-	Object* technologyObj = doParseFile( (V2Loc + "\\common\\technology.txt").c_str() );
+	Object* technologyObj = doParseFile( (V2Loc + "/common/technology.txt").c_str() );
 	if (technologyObj == NULL)
 	{
-		LOG(LogLevel::Error) << "Could not parse file " << V2Loc << "\\common\\technology.txt";
+		LOG(LogLevel::Error) << "Could not parse file " << V2Loc << "/common/technology.txt";
 		exit(-1);
 	}
 	vector<techSchool> techSchools;
@@ -828,10 +834,10 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	// Get EU4 custom flag colours
 	FlagColourMapping flagColourMapping;
 	LOG(LogLevel::Info) << "Parsing EU4 flag colours";
-	Object* colorsObj = doParseFile((EU4Loc + "\\common\\custom_country_colors\\00_custom_country_colors.txt").c_str());
+	Object* colorsObj = doParseFile((EU4Loc + "/common/custom_country_colors/00_custom_country_colors.txt").c_str());
 	if (colorsObj == NULL)
 	{
-		LOG(LogLevel::Warning) << "Could not parse file " << EU4Loc << "\\common\\custom_country_colors\\00_custom_country_colors.txt";
+		LOG(LogLevel::Warning) << "Could not parse file " << EU4Loc << "/common/custom_country_colors/00_custom_country_colors.txt";
 	}
 	else if (colorsObj->getLeaves().size() < 1)
 	{
@@ -844,10 +850,10 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 
 	// Get EU4 colonial regions
 	LOG(LogLevel::Info) << "Parsing EU4 colonial regions";
-	Object* colonialRegionsObj = doParseFile((EU4Loc + "\\common\\colonial_regions\\00_colonial_regions.txt").c_str());
+	Object* colonialRegionsObj = doParseFile((EU4Loc + "/common/colonial_regions/00_colonial_regions.txt").c_str());
 	if (colonialRegionsObj == NULL)
 	{
-		LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "\\common\\colonial_regions\\00_colonial_regions.txt";
+		LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "/common/colonial_regions/00_colonial_regions.txt";
 		exit(-1);
 	}
 	if (colonialRegionsObj->getLeaves().size() < 1)
@@ -860,7 +866,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	{
 		struct _finddata_t	fileData;				// the file data info
 		intptr_t					fileListing = NULL;	// the file listing info
-		if ((fileListing = _findfirst(string(*itr + "\\common\\colonial_regions\\*").c_str(), &fileData)) != -1L)
+		if ((fileListing = _findfirst(string(*itr + "/common/colonial_regions/*").c_str(), &fileData)) != -1L)
 		{
 			do
 			{
@@ -874,7 +880,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 				}
 				else
 				{
-					string modRegionsFile(*itr + "\\common\\colonial_regions\\" + fileData.name);	// the path and name of the colonial regions file in this mod
+					string modRegionsFile(*itr + "/common/colonial_regions/" + fileData.name);	// the path and name of the colonial regions file in this mod
 #ifdef _WIN32
 					if ((_stat(modRegionsFile.c_str(), &st) == 0))
 #endif
@@ -898,10 +904,10 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 
 	// Parse EU4 Regions
 	LOG(LogLevel::Info) << "Parsing EU4 regions";
-	Object* regionsObj = doParseFile((EU4Loc + "\\map\\region.txt").c_str());
+	Object* regionsObj = doParseFile((EU4Loc + "/map/region.txt").c_str());
 	if (regionsObj == NULL)
 	{
-		LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "\\map\\region.txt";
+		LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "/map/region.txt";
 		exit(-1);
 	}
 	if (regionsObj->getLeaves().size() < 1)
@@ -913,7 +919,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	initEU4RegionMapOldVersion(regionsObj, EU4RegionsMap);
 	for (vector<string>::iterator itr = fullModPaths.begin(); itr != fullModPaths.end(); itr++)
 	{
-		string modRegionFile(*itr + "\\map\\region.txt");
+		string modRegionFile(*itr + "/map/region.txt");
 #ifdef _WIN32
 		if ((_stat(modRegionFile.c_str(), &st) == 0))
 #endif
@@ -932,10 +938,10 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	}
 	if (EU4RegionsMap.size() == 0) // if it failed, we're using the new regions format
 	{
-		Object* areaObj = doParseFile((EU4Loc + "\\map\\area.txt").c_str());
+		Object* areaObj = doParseFile((EU4Loc + "/map/area.txt").c_str());
 		if (areaObj == NULL)
 		{
-			LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "\\map\\area.txt";
+			LOG(LogLevel::Error) << "Could not parse file " << EU4Loc << "/map/area.txt";
 			exit(-1);
 		}
 		if (areaObj->getLeaves().size() < 1)
@@ -946,7 +952,7 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 		initEU4RegionMap(regionsObj, areaObj, EU4RegionsMap);
 		for (vector<string>::iterator itr = fullModPaths.begin(); itr != fullModPaths.end(); itr++)
 		{
-			string modAreaFile(*itr + "\\map\\area.txt");
+			string modAreaFile(*itr + "/map/area.txt");
 #ifdef _WIN32
 			if ((_stat(modAreaFile.c_str(), &st) == 0))
 #endif

@@ -220,7 +220,8 @@ void GetAllFilesInFolder(const std::string& path, std::set<std::string>& fileNam
 	}
 	while ((ent = readdir(dir)) != NULL)
 	{
-		fileNames.insert(ent->d_name);
+		if (doesFolderExist(ent->d_name) == false)
+			fileNames.insert(ent->d_name);
 	}
 	closedir(dir);
 }
@@ -256,15 +257,18 @@ bool DoesFileExist(const std::string& path)
 	return false;
 }
 
+// BUGGED
 bool doesFolderExist(const std::string& path)
 {
-	DIR * dir;
-	if ((dir = opendir(path.c_str())) == NULL)
+	struct stat st;
+	if (stat(path.c_str(), &st) != -1)
 	{
-		return false;
+		if(S_ISDIR(st.st_mode))
+		{
+			return true;
+		}
 	}
-	closedir(dir);
-	return true;
+	return false;
 }
 
 #endif // __unix__

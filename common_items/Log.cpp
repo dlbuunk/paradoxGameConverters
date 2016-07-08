@@ -55,10 +55,10 @@ Log::~Log()
 
 void Log::WriteToConsole(LogLevel level, const std::string& logMessage)
 {
-	if (level == LogLevel::Debug)
-	{	// Don't log debug messages to console.
-		return;
-	}
+//	if (level == LogLevel::Debug)
+//	{	// Don't log debug messages to console.
+//		return;
+//	}
 
 #ifdef _WIN32
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);	// a handle to the console window

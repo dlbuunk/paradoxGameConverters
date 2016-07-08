@@ -158,7 +158,7 @@ typedef struct {
 adjacencyMapping initAdjacencyMap()
 {
 	FILE* adjacenciesBin = NULL;	// the adjacencies.bin file
-	string filename = Configuration::getV2DocumentsPath() + "\\map\\cache\\adjacencies.bin";	// the path and filename for adjacencies.bin
+	string filename = Configuration::getV2DocumentsPath() + "/map/cache/adjacencies.bin";	// the path and filename for adjacencies.bin
 #ifdef _WIN32
 	struct _stat st;	// the data structure telling us if the file exists
 	if ((_stat(filename.c_str(), &st) != 0))
@@ -169,7 +169,7 @@ adjacencyMapping initAdjacencyMap()
 #endif
 	{
 		LOG(LogLevel::Warning) << "Could not find " << filename << " - looking in install folder";
-		filename = Configuration::getV2Path() + "\\map\\cache\\adjacencies.bin";
+		filename = Configuration::getV2Path() + "/map/cache/adjacencies.bin";
 	}
 #ifdef _WIN32
 	fopen_s(&adjacenciesBin, filename.c_str(), "rb");
@@ -988,7 +988,7 @@ colonyFlagset initColonyFlagset(Object* obj)
 CK2TitleMapping initCK2TitleMap(Object* obj)
 {
 	CK2TitleMapping titleMapContainer;
-	map<string, string>& titleMap = titleMapContainer.map;
+	map<string, string>& titleMap = titleMapContainer.ntmap;
 
 	vector<Object*> titles = obj->getLeaves();
 	vector<Object*> links = titles[0]->getLeaves();	
