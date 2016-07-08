@@ -23,11 +23,20 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include "WinUtils.h"
 
+#ifdef _WIN32
 #include <Windows.h>
+#endif
+#ifdef __unix__
+#include <sys/stat.h>
+#include <dirent.h>
+#endif
 
 #include "Log.h"
 
+
 namespace WinUtils {
+
+#ifdef _WIN32
 
 bool TryCreateFolder(const std::string& path)
 {
@@ -81,7 +90,7 @@ bool DoesFileExist(const std::string& path)
 	return (attributes != INVALID_FILE_ATTRIBUTES && !(attributes & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-
+i
 bool doesFolderExist(const std::string& path)
 {
 	DWORD attributes = GetFileAttributes(path.c_str());	// the file attributes
@@ -183,5 +192,81 @@ int DeleteFolder(const std::string &refcstrRootDirectory,
 
 	return 0;
 }
+
+#endif // _WIN32
+#ifdef __unix__
+
+bool TryCreateFolder(const std::string& path)
+{
+	if (doesFolderExist(path))
+		return true;
+	const int dir_err = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	if (dir_err == -1)
+	{
+		LOG(LogLevel::Warning) << "Could not create folder " << path;
+		return false;
+	}
+	return true;
+}
+
+void GetAllFilesInFolder(const std::string& path, std::set<std::string>& fileNames)
+{
+	DIR * dir;
+	dirent * ent;
+	if ((dir = opendir(path.c_str())) == NULL)
+	{
+		LOG(LogLevel::Warning) << "Could not read folder " << path;
+		return;
+	}
+	while ((ent = readdir(dir)) != NULL)
+	{
+		fileNames.insert(ent->d_name);
+	}
+	closedir(dir);
+}
+
+bool TryCopyFile(const std::string& sourcePath, const std::string& destPath)
+{
+	FILE * in, * out;
+	char ch;
+	if ((in = fopen(sourcePath.c_str(), "r")) == NULL)
+	{
+		LOG(LogLevel::Warning) << "Could not copy file " << sourcePath << " to " << destPath;
+		return false;
+	}
+	if ((out = fopen(destPath.c_str(), "w")) == NULL)
+	{
+		LOG(LogLevel::Warning) << "Could not copy file " << sourcePath << " to " << destPath;
+		return false;
+	}
+	while((ch = fgetc(in)) != EOF)
+	{
+		fputc(ch, out);
+	}
+	fclose(in);
+	fclose(out);
+	return true;
+}
+
+bool DoesFileExist(const std::string& path)
+{
+	struct stat st;
+	if (stat(path.c_str(), &st) == 0)
+		return true;
+	return false;
+}
+
+bool doesFolderExist(const std::string& path)
+{
+	DIR * dir;
+	if ((dir = opendir(path.c_str())) == NULL)
+	{
+		return false;
+	}
+	closedir(dir);
+	return true;
+}
+
+#endif // __unix__
 
 } // namespace WinUtils

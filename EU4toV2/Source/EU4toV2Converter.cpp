@@ -22,22 +22,35 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 
 #include <fstream>
+#ifdef _WIN32
 #include <io.h>
+#endif
+#ifdef __unix__
+extern "C" {
+#include "findfirst.h"
+}
+#endif
 #include <stdexcept>
 #include <sys/stat.h>
 
+#ifdef _WIN32
 #include <Windows.h>
+#endif
+#ifdef __unix__
+#include <unistd.h>
+#define MAX_PATH 512
+#endif
 
 #include "Configuration.h"
 #include "Log.h"
 #include "ParadoxParser.h"
-#include "EU4World\EU4World.h"
-#include "EU4World\EU4Religion.h"
-#include "EU4World\EU4Localisation.h"
-#include "V2World\V2World.h"
-#include "V2World\V2Factory.h"
-#include "V2World\V2TechSchools.h"
-#include "V2World\V2LeaderTraits.h"
+#include "EU4World/EU4World.h"
+#include "EU4World/EU4Religion.h"
+#include "EU4World/EU4Localisation.h"
+#include "V2World/V2World.h"
+#include "V2World/V2Factory.h"
+#include "V2World/V2TechSchools.h"
+#include "V2World/V2LeaderTraits.h"
 #include "WinUtils.h"
 
 
@@ -46,7 +59,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 {
 	char curDir[MAX_PATH];
+#ifdef _WIN32
 	GetCurrentDirectory(MAX_PATH, curDir);
+#endif
+#ifdef __unix__
+	getcwd(curDir, MAX_PATH);
+#endif
 	LOG(LogLevel::Debug) << "Current directory is " << curDir;
 
 	Configuration::getInstance();
@@ -76,8 +94,14 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	// Get V2 install location
 	LOG(LogLevel::Info) << "Get V2 Install Path";
 	string V2Loc = Configuration::getV2Path();	// the V2 install location as stated in the configuration file
+#ifdef _WIN32
 	struct _stat st;										// the file info
 	if (V2Loc.empty() || (_stat(V2Loc.c_str(), &st) != 0))
+#endif
+#ifdef __unix__
+	struct stat st;
+	if (V2Loc.empty() || (stat(V2Loc.c_str(), &st) != 0))
+#endif
 	{
 		LOG(LogLevel::Error) << "No Victoria 2 path was specified in configuration.txt, or the path was invalid";
 		return (-1);
@@ -90,7 +114,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	// Get V2 Documents Directory
 	LOG(LogLevel::Debug) << "Get V2 Documents directory";
 	string V2DocLoc = Configuration::getV2DocumentsPath();	// the V2 My Documents location as stated in the configuration file
+#ifdef _WIN32
 	if (V2DocLoc.empty() || (_stat(V2DocLoc.c_str(), &st) != 0))
+#endif
+#ifdef __unix__
+	if (V2DocLoc.empty() || (stat(V2DocLoc.c_str(), &st) != 0))
+#endif
 	{
 		LOG(LogLevel::Error) << "No Victoria 2 documents directory was specified in configuration.txt, or the path was invalid";
 		return (-1);
@@ -103,7 +132,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	// Get EU4 install location
 	LOG(LogLevel::Debug) << "Get EU4 Install Path";
 	string EU4Loc = Configuration::getEU4Path();	// the EU4 install location as stated in the configuration file
+#ifdef _WIN32
 	if (EU4Loc.empty() || (_stat(EU4Loc.c_str(), &st) != 0))
+#endif
+#ifdef __unix__
+	if (EU4Loc.empty() || (stat(EU4Loc.c_str(), &st) != 0))
+#endif
 	{
 		LOG(LogLevel::Error) << "No Europa Universalis 4 path was specified in configuration.txt, or the path was invalid";
 		return (-1);
@@ -117,7 +151,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	map<string, string> possibleMods; // name, path
 	LOG(LogLevel::Debug) << "Get EU4 Mod Directory";
 	string EU4DocumentsLoc = Configuration::getEU4DocumentsPath();	// the EU4 My Documents location as stated in the configuration file
+#ifdef _WIN32
 	if (EU4DocumentsLoc.empty() || (_stat(EU4DocumentsLoc.c_str(), &st) != 0))
+#endif
+#ifdef __unix__
+	if (EU4DocumentsLoc.empty() || (stat(EU4DocumentsLoc.c_str(), &st) != 0))
+#endif
 	{
 		LOG(LogLevel::Error) << "No Europa Universalis 4 documents directory was specified in configuration.txt, or the path was invalid";
 		return (-1);
@@ -172,7 +211,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	// Get CK2 Export directory
 	LOG(LogLevel::Debug) << "Get CK2 Export Directory";
 	string CK2ExportLoc = Configuration::getCK2ExportPath();		// the CK2 converted mods location as stated in the configuration file
+#ifdef _WIN32
 	if (CK2ExportLoc.empty() || (_stat(CK2ExportLoc.c_str(), &st) != 0))
+#endif
+#ifdef __unix__
+	if (CK2ExportLoc.empty() || (stat(CK2ExportLoc.c_str(), &st) != 0))
+#endif
 	{
 		LOG(LogLevel::Warning) << "No Crusader Kings 2 mod directory was specified in configuration.txt, or the path was invalid - this will cause problems with CK2 converted saves";
 	}
@@ -293,7 +337,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 				if (modItr != possibleMods.end())
 				{
 					string newModPath = modItr->second;	// the path for this mod
+#ifdef _WIN32
 					if (newModPath.empty() || (_stat(newModPath.c_str(), &st) != 0))
+#endif
+#ifdef __unix__
+					if (newModPath.empty() || (stat(newModPath.c_str(), &st) != 0))
+#endif
 					{
 						LOG(LogLevel::Error) << newMod << " could not be found in the specified mod directory - a valid mod directory must be specified. Tried " << newModPath;
 						exit(-1);
@@ -560,7 +609,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	for (vector<string>::iterator itr = fullModPaths.begin(); itr != fullModPaths.end(); itr++)
 	{
 		string continentFile = *itr + "\\map\\continent.txt";	// the path and name of the continent file
+#ifdef _WIN32
 		if ((_stat(continentFile.c_str(), &st) == 0))
+#endif
+#ifdef __unix__
+		if ((stat(continentFile.c_str(), &st) == 0))
+#endif
 		{
 			Object* continentObject = doParseFile(continentFile.c_str());
 			if ((continentObject != NULL) && (continentObject->getLeaves().size() > 0))
@@ -592,7 +646,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	// Generate region mapping
 	LOG(LogLevel::Info) << "Parsing region structure";
 	Object* Vic2RegionsObj;
+#ifdef _WIN32
 	if (_stat(".\\blankMod\\output\\map\\region.txt", &st) == 0)
+#endif
+#ifdef __unix__
+	if (stat("./blankMod/output/map/region.txt", &st) == 0)
+#endif
 	{
 		Vic2RegionsObj = doParseFile(".\\blankMod\\output\\map\\region.txt");
 		if (Vic2RegionsObj == NULL)
@@ -653,7 +712,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 				else
 				{
 					string modReligionFile(*itr + "\\common\\religions\\" + fileData.name);	// the path and name of the religions file in this mod
+#ifdef _WIN32
 					if ((_stat(modReligionFile.c_str(), &st) == 0))
+#endif
+#ifdef __unix__
+					if ((stat(modReligionFile.c_str(), &st) == 0))
+#endif
 					{
 						religionsObj = doParseFile(modReligionFile.c_str());
 						if (religionsObj == NULL)
@@ -811,7 +875,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 				else
 				{
 					string modRegionsFile(*itr + "\\common\\colonial_regions\\" + fileData.name);	// the path and name of the colonial regions file in this mod
+#ifdef _WIN32
 					if ((_stat(modRegionsFile.c_str(), &st) == 0))
+#endif
+#ifdef __unix__
+					if ((stat(modRegionsFile.c_str(), &st) == 0))
+#endif
 					{
 						colonialRegionsObj = doParseFile(modRegionsFile.c_str());
 						if (colonialRegionsObj == NULL)
@@ -845,7 +914,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	for (vector<string>::iterator itr = fullModPaths.begin(); itr != fullModPaths.end(); itr++)
 	{
 		string modRegionFile(*itr + "\\map\\region.txt");
+#ifdef _WIN32
 		if ((_stat(modRegionFile.c_str(), &st) == 0))
+#endif
+#ifdef __unix__
+		if ((stat(modRegionFile.c_str(), &st) == 0))
+#endif
 		{
 			regionsObj = doParseFile(modRegionFile.c_str());
 			if (regionsObj == NULL)
@@ -873,7 +947,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 		for (vector<string>::iterator itr = fullModPaths.begin(); itr != fullModPaths.end(); itr++)
 		{
 			string modAreaFile(*itr + "\\map\\area.txt");
+#ifdef _WIN32
 			if ((_stat(modAreaFile.c_str(), &st) == 0))
+#endif
+#ifdef __unix__
+			if ((stat(modAreaFile.c_str(), &st) == 0))
+#endif
 			{
 				areaObj = doParseFile(modAreaFile.c_str());
 				if (areaObj == NULL)
@@ -928,7 +1007,12 @@ int ConvertEU4ToV2(const std::string& EU4SaveFileName)
 	LOG(LogLevel::Info) << "Outputting mod";
 	system("%systemroot%\\System32\\xcopy blankMod output /E /Q /Y /I");
 	FILE* modFile;	// the .mod file for this mod
+#ifdef _WIN32
 	if (fopen_s(&modFile, ("Output\\" + Configuration::getOutputName() + ".mod").c_str(), "w") != 0)
+#endif
+#ifdef __unix__
+	if ((modFile = fopen(("Output/" + Configuration::getOutputName() + ".mod").c_str(), "w")) != 0)
+#endif
 	{
 		LOG(LogLevel::Error) << "Could not create .mod file";
 		exit(-1);

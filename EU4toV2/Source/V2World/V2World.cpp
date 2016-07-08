@@ -34,7 +34,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 #include <io.h>
 #endif
 #ifdef __unix__
+extern "C" {
 #include "findfirst.h"
+}
 #endif
 #include <list>
 #include <queue>

@@ -32,14 +32,14 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include <boost/algorithm/string.hpp>
 
-#include "EU4World\EU4World.h"
-#include "EU4World\EU4Country.h"
-#include "EU4World\EU4Province.h"
+#include "EU4World/EU4World.h"
+#include "EU4World/EU4Country.h"
+#include "EU4World/EU4Province.h"
 #include "Object.h"
 #include "ParadoxParser.h"
-#include "V2World\V2World.h"
-#include "V2World\V2Country.h"
-#include "V2World\V2Province.h"
+#include "V2World/V2World.h"
+#include "V2World/V2Country.h"
+#include "V2World/V2Province.h"
 #include "WinUtils.h"
 #include "Log.h"
 
@@ -164,7 +164,12 @@ void CountryMapping::CreateMapping(const EU4World& srcWorld, const V2World& dest
 	{
 		const std::string& EU4Tag = i->first;	// the EU4 tag being considered
 		char charTag[4];
+#ifdef _WIN32
 		strcpy_s(charTag, EU4Tag.c_str());
+#endif
+#ifdef __unix__
+		strncpy(charTag, EU4Tag.c_str(), 4);
+#endif
 
 		// colonial replacements
 		if (i->second->isColony() && isalpha(charTag[0]) && isdigit(charTag[1]) && isdigit(charTag[2]))

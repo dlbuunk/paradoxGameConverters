@@ -159,13 +159,24 @@ adjacencyMapping initAdjacencyMap()
 {
 	FILE* adjacenciesBin = NULL;	// the adjacencies.bin file
 	string filename = Configuration::getV2DocumentsPath() + "\\map\\cache\\adjacencies.bin";	// the path and filename for adjacencies.bin
+#ifdef _WIN32
 	struct _stat st;	// the data structure telling us if the file exists
 	if ((_stat(filename.c_str(), &st) != 0))
+#endif
+#ifdef __unix__
+	struct stat st;
+	if (stat(filename.c_str(), &st) != 0)
+#endif
 	{
 		LOG(LogLevel::Warning) << "Could not find " << filename << " - looking in install folder";
 		filename = Configuration::getV2Path() + "\\map\\cache\\adjacencies.bin";
 	}
+#ifdef _WIN32
 	fopen_s(&adjacenciesBin, filename.c_str(), "rb");
+#endif
+#ifdef __unix__
+	adjacenciesBin = fopen(filename.c_str(), "rb");
+#endif
 	if (adjacenciesBin == NULL)
 	{
 		LOG(LogLevel::Error) << "Could not open " << filename;
