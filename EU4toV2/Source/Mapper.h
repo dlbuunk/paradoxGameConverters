@@ -27,7 +27,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 
 #include "Object.h"
-#include "EU4World\EU4Version.h"
+#include "EU4World/EU4Version.h"
 #include "FlagUtils.h"
 #include <map>
 #include <vector>

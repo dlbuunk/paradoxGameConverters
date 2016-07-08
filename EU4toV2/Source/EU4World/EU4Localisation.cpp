@@ -26,7 +26,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 #include <fstream>
 #include <vector>
 
+#ifdef _WIN32
 #include <Windows.h>
+#endif
+#ifdef __unix__
+#include <dirent.h>
+#endif
 
 void EU4Localisation::ReadFromFile(const std::string& fileName)
 {
@@ -62,6 +67,7 @@ void EU4Localisation::ReadFromFile(const std::string& fileName)
 
 void EU4Localisation::ReadFromAllFilesInFolder(const std::string& folderPath)
 {
+#ifdef _WIN32
 	// Get all files in the folder.
 	std::vector<std::string> fileNames;
 	WIN32_FIND_DATA findData;	// the file data
@@ -84,6 +90,19 @@ void EU4Localisation::ReadFromAllFilesInFolder(const std::string& folderPath)
 	{
 		ReadFromFile(folderPath + '\\' + fileName);
 	}
+#endif // _WIN32
+#ifdef __unix__
+	DIR * dir;
+	dirent * entry;
+	if ((dir = opendir(folderPath.c_str())) != NULL)
+	{
+		while ((entry = readdir(dir)) != NULL)
+		{
+			ReadFromFile(folderPath + '/' + entry->d_name);
+		}
+		closedir(dir);
+	}
+#endif // __unix__
 }
 
 const std::string& EU4Localisation::GetText(const std::string& key, const std::string& language) const
