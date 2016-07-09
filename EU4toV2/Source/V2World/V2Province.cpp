@@ -81,7 +81,7 @@ V2Province::V2Province(string _filename)
 
 	resettable			= false;
 
-	int slash		= filename.find_last_of("\\");
+	int slash		= filename.find_last_of("/");
 	int numDigits	= filename.find_first_of("-") - slash - 2;
 	string temp		= filename.substr(slash + 1, numDigits);
 	num				= atoi(temp.c_str());

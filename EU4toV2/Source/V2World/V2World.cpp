@@ -89,9 +89,9 @@ V2World::V2World(const minorityPopMapping& minorities)
 	bool provincesImported = false;
 	while (directories.size() > 0)
 	{
-		if ((fileListing = _findfirst((string("./blankMod/output/history/provinces") + directories.front() + "/*.*").c_str(), &provinceFileData)) == -1L)
+		if ((fileListing = _findfirst((string("./blankMod/output/history/provinces/") + directories.front() + "/*.*").c_str(), &provinceFileData)) == -1L)
 		{
-			LOG(LogLevel::Error) << "Could not open directory ./blankMod/output/history/provinces" << directories.front() << "/*.*";
+			LOG(LogLevel::Error) << "Could not open directory ./blankMod/output/history/provinces/" << directories.front() << "/*.*";
 			exit(-1);
 		}
 
@@ -182,7 +182,6 @@ V2World::V2World(const minorityPopMapping& minorities)
 		for (unsigned int j = 0; j < leaves.size(); j++)
 		{
 			int provNum = atoi(leaves[j]->getKey().c_str());
-			cout << leaves[j]->getKey() << "?\n" << provNum << "!\n";
 			map<int, V2Province*>::iterator k = provinces.find(provNum);
 			if (k == provinces.end())
 			{

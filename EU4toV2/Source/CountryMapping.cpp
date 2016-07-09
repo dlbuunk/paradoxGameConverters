@@ -140,7 +140,7 @@ void CountryMapping::CreateMapping(const EU4World& srcWorld, const V2World& dest
 	EU4TagToV2TagMap.clear();
 	
 	// Generate a list (or at least a rough guide) of all flags that we can use.
-	const std::vector<std::string> availableFlagFolders = { "blankMod\\output\\gfx\\flags", Configuration::getV2Path() + "\\gfx\\flags" };
+	const std::vector<std::string> availableFlagFolders = { "blankMod/output/gfx/flags", Configuration::getV2Path() + "/gfx/flags" };
 	std::set<std::string> availableFlagFiles;
 	for (size_t i = 0; i < availableFlagFolders.size(); ++i)
 	{
@@ -391,7 +391,7 @@ void CountryMapping::LogMapping(const std::string& EU4Tag, const std::string& V2
 
 std::string CountryMapping::GetCK2Title(const std::string& EU4Tag, const std::string& countryName, const std::set<std::string>& availableFlags, const CK2TitleMapping& CK2titlesContainer)
 {
-	std::map<string,string> CK2titles = CK2titlesContainer.map;
+	std::map<string,string> CK2titles = CK2titlesContainer.ntmap;
 
 	//V2Country* v2source = i->second;
 

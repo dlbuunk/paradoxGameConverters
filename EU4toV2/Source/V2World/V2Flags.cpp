@@ -49,7 +49,7 @@ void V2Flags::SetV2Tags(const std::map<std::string, V2Country*>& V2Countries, co
 	static std::mt19937 generator(static_cast<int>(std::chrono::system_clock::now().time_since_epoch().count()));
 
 	// Generate a list of all flags that we can use.
-	const std::vector<std::string> availableFlagFolders = { "blankMod\\output\\gfx\\flags", Configuration::getV2Path() + "\\gfx\\flags" };
+	const std::vector<std::string> availableFlagFolders = { "blankMod/output/gfx/flags", Configuration::getV2Path() + "/gfx/flags" };
 	std::set<std::string> availableFlags;
 	for (size_t i = 0; i < availableFlagFolders.size(); ++i)
 	{
@@ -326,7 +326,7 @@ bool V2Flags::Output() const
 	}
 
 	// Copy files.
-	const std::vector<std::string> availableFlagFolders = { "blankMod\\output\\gfx\\flags", Configuration::getV2Path() + "\\gfx\\flags" };
+	const std::vector<std::string> availableFlagFolders = { "blankMod/output/gfx/flags", Configuration::getV2Path() + "/gfx/flags" };
 	for (V2TagToFlagTagMap::const_iterator i = tagMapping.begin(); i != tagMapping.end(); ++i)
 	{
 		const std::string& V2Tag = i->first;
@@ -338,18 +338,18 @@ bool V2Flags::Output() const
 			for (std::vector<std::string>::const_iterator j = availableFlagFolders.begin(); j != availableFlagFolders.end() && !flagFileFound; ++j)
 			{
 				const std::string& folderPath = *j;
-				std::string sourceFlagPath = folderPath + '\\' + flagTag + suffix;
+				std::string sourceFlagPath = folderPath + '/' + flagTag + suffix;
 				flagFileFound = WinUtils::DoesFileExist(sourceFlagPath);
 				if (flagFileFound)
 				{
-					std::string destFlagPath = outputFlagFolder + '\\' + V2Tag + suffix;
+					std::string destFlagPath = outputFlagFolder + '/' + V2Tag + suffix;
 					WinUtils::TryCopyFile(sourceFlagPath, destFlagPath);
 				}
 			}
 		}
 	}
 
-	std::string baseFlagFolder = "blankMod\\output\\gfx\\flags";
+	std::string baseFlagFolder = "blankMod/output/gfx/flags";
 
 	for (auto cflag : customFlagMapping)
 	{
@@ -378,13 +378,13 @@ bool V2Flags::Output() const
 			bool flagFileFound = false;
 			std::string folderPath = baseFlagFolder;
 			
-			std::string sourceFlagPath = folderPath + "\\CustomBases\\" + baseFlag + ".tga";
-			std::string sourceEmblemPath = folderPath + "\\CustomEmblems\\" + emblem + suffix;
+			std::string sourceFlagPath = folderPath + "/CustomBases/" + baseFlag + ".tga";
+			std::string sourceEmblemPath = folderPath + "/CustomEmblems/" + emblem + suffix;
 			
 			flagFileFound = (WinUtils::DoesFileExist(sourceFlagPath) && WinUtils::DoesFileExist(sourceEmblemPath));
 			if (flagFileFound)
 			{
-				std::string destFlagPath = outputFlagFolder + '\\' + V2Tag + suffix;
+				std::string destFlagPath = outputFlagFolder + '/' + V2Tag + suffix;
 				
 				CreateCustomFlag( 
 					flagColourMapping[std::get<0>(cflag.second.colours)],
@@ -426,12 +426,12 @@ bool V2Flags::Output() const
 			if ((i == 0 || i == 3) // monarchy or vanilla
 				&& (UniqueColonialFlags.find(baseFlag) == UniqueColonialFlags.end()))
 			{
-				std::string sourceFlagPath = folderPath + '\\' + baseFlag + suffix;
-				std::string overlordFlagPath = folderPath + '\\' + overlord + ".tga";
+				std::string sourceFlagPath = folderPath + '/' + baseFlag + suffix;
+				std::string overlordFlagPath = folderPath + '/' + overlord + ".tga";
 				flagFileFound = (WinUtils::DoesFileExist(sourceFlagPath) && WinUtils::DoesFileExist(overlordFlagPath));
 				if (flagFileFound)
 				{
-					std::string destFlagPath = outputFlagFolder + '\\' + V2Tag + suffix;
+					std::string destFlagPath = outputFlagFolder + '/' + V2Tag + suffix;
 					CreateColonialFlag(overlordFlagPath, sourceFlagPath, destFlagPath);
 				}
 				else
@@ -444,11 +444,11 @@ bool V2Flags::Output() const
 			}
 			else
 			{
-				std::string sourceFlagPath = folderPath + '\\' + baseFlag + suffix;
+				std::string sourceFlagPath = folderPath + '/' + baseFlag + suffix;
 				flagFileFound = WinUtils::DoesFileExist(sourceFlagPath);
 				if (flagFileFound)
 				{
-					std::string destFlagPath = outputFlagFolder + '\\' + V2Tag + suffix;
+					std::string destFlagPath = outputFlagFolder + '/' + V2Tag + suffix;
 					WinUtils::TryCopyFile(sourceFlagPath, destFlagPath);
 				}
 				else
