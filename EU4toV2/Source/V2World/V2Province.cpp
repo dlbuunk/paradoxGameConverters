@@ -195,9 +195,9 @@ void V2Province::output() const
 	}
 #endif // _WIN32
 #ifdef __unix__
-	if ((output = fopen(("Output/" + Configuration::getOutputName() + "/history/provinces/" + filename).c_str(), "w")) != 0)
+	if ((output = fopen(("output/" + Configuration::getOutputName() + "/history/provinces/" + filename).c_str(), "w")) == 0)
 	{
-		LOG(LogLevel::Error) << "Could not create province history file Output/" << Configuration::getOutputName() << "/history/provinces/" << filename;
+		LOG(LogLevel::Error) << "Could not create province history file output/" << Configuration::getOutputName() << "/history/provinces/" << filename;
 		exit(-1);
 	}
 #endif // __unix__

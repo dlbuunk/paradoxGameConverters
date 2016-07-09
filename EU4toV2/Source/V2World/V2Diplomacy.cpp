@@ -36,7 +36,7 @@ void V2Diplomacy::output() const
 	if (fopen_s(&alliances, ("Output\\" + Configuration::getOutputName() + "\\history\\diplomacy\\Alliances.txt").c_str(), "w") != 0)
 #endif
 #ifdef __unix__
-	if ((alliances = fopen(("Output/" + Configuration::getOutputName() + "/history/diplomacy/Alliances.txt").c_str(), "w")) != 0)
+	if ((alliances = fopen(("output/" + Configuration::getOutputName() + "/history/diplomacy/Alliances.txt").c_str(), "w")) == 0)
 #endif
 	{
 		LOG(LogLevel::Error) << "Could not create alliances history file";
@@ -48,7 +48,7 @@ void V2Diplomacy::output() const
 	if (fopen_s(&guarantees, ("Output\\" + Configuration::getOutputName() + "\\history\\diplomacy\\Guarantees.txt").c_str(), "w") != 0)
 #endif
 #ifdef __unix__
-	if ((guarantees = fopen(("Output/" + Configuration::getOutputName() + "/history/diplomacy/Guarantees.txt").c_str(), "w")) != 0)
+	if ((guarantees = fopen(("output/" + Configuration::getOutputName() + "/history/diplomacy/Guarantees.txt").c_str(), "w")) == 0)
 #endif
 	{
 		LOG(LogLevel::Error) << "Could not create guarantees history file";
@@ -60,7 +60,7 @@ void V2Diplomacy::output() const
 	if (fopen_s(&puppetStates, ("Output\\" + Configuration::getOutputName() + "\\history\\diplomacy\\PuppetStates.txt").c_str(), "w") != 0)
 #endif
 #ifdef __unix__
-	if ((puppetStates = fopen(("Output/" + Configuration::getOutputName() + "/history/diplomacy/PuppetStates.txt").c_str(), "w")) != 0)
+	if ((puppetStates = fopen(("output/" + Configuration::getOutputName() + "/history/diplomacy/PuppetStates.txt").c_str(), "w")) == 0)
 #endif
 	{
 		LOG(LogLevel::Error) << "Could not create puppet states history file";
@@ -72,7 +72,7 @@ void V2Diplomacy::output() const
 	if (fopen_s(&unions, ("Output\\" + Configuration::getOutputName() + "\\history\\diplomacy\\Unions.txt").c_str(), "w") != 0)
 #endif
 #ifdef __unix__
-	if ((unions = fopen(("Output/" + Configuration::getOutputName() + "/history/diplomacy/Unions.txt").c_str(), "w")) != 0)
+	if ((unions = fopen(("output/" + Configuration::getOutputName() + "/history/diplomacy/Unions.txt").c_str(), "w")) == 0)
 #endif
 	{
 		LOG(LogLevel::Error) << "Could not create unions history file";

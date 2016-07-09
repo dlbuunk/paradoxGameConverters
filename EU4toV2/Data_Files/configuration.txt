@@ -22,7 +22,7 @@
 configuration =
 {
 	# Europa Universalis 4 directory: a path on your computer where Europa Universalis 4 is installed
-	EU4directory = "/home/dlb/.steam/steam/SteamApps/common/Europa Universalis IV"
+	EU4directory = "/home/dlb/.steam/steam/steamapps/common/Europa Universalis IV"
 
 	# Europa Universalis 4 documents directory: a path on your computer where Europa Universalis 4 keeps temporary files
 	EU4DocumentsDirectory = "/home/dlb/.local/share/Paradox Interactive/Europa Universalis IV"

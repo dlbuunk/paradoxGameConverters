@@ -420,7 +420,7 @@ V2World::V2World(const minorityPopMapping& minorities)
 void V2World::output() const
 {
 	// Create common\countries path.
-	string countriesPath = "Output/" + Configuration::getOutputName() + "/common/countries";
+	string countriesPath = "output/" + Configuration::getOutputName() + "/common/countries";
 	if (!WinUtils::TryCreateFolder(countriesPath))
 	{
 		return;
@@ -433,7 +433,7 @@ void V2World::output() const
 	if (fopen_s(&allCountriesFile, ("Output\\" + Configuration::getOutputName() + "\\common\\countries.txt").c_str(), "w") != 0)
 #endif
 #ifdef __unix__
-	if ((allCountriesFile = fopen(("Output/" + Configuration::getOutputName() + "/common/countries.txt").c_str(), "w")) != 0)
+	if ((allCountriesFile = fopen(("output/" + Configuration::getOutputName() + "/common/countries.txt").c_str(), "w")) == 0)
 #endif
 	{
 		LOG(LogLevel::Error) << "Could not create countries file";
@@ -467,7 +467,7 @@ void V2World::output() const
 
 	// Create localisations for all new countries. We don't actually know the names yet so we just use the tags as the names.
 	LOG(LogLevel::Debug) << "Writing localisation text";
-	string localisationPath = "Output/" + Configuration::getOutputName() + "/localisation";
+	string localisationPath = "output/" + Configuration::getOutputName() + "/localisation";
 	if (!WinUtils::TryCreateFolder(localisationPath))
 	{
 		return;
@@ -505,7 +505,7 @@ void V2World::output() const
 		if (fopen_s(&zeronamesfile, zeronamesfilepath.c_str(), "w") != 0)
 #endif
 #ifdef __unix__
-		if ((zeronamesfile = fopen(zeronamesfilepath.c_str(), "w")) != 0)
+		if ((zeronamesfile = fopen(zeronamesfilepath.c_str(), "w")) == 0)
 #endif
 			fclose(zeronamesfile);
 
@@ -520,7 +520,7 @@ void V2World::output() const
 	if (fopen_s(&localisationFile, (localisationPath + "\\0_Names.csv").c_str(), "a") != 0)
 #endif
 #ifdef __unix__
-	if ((localisationFile = fopen((localisationPath + "/0_Names.csv").c_str(), "a")) != 0)
+	if ((localisationFile = fopen((localisationPath + "/0_Names.csv").c_str(), "a")) == 0)
 #endif
 	{
 		LOG(LogLevel::Error) << "Could not update localisation text file";
@@ -553,7 +553,7 @@ void V2World::output() const
 
 	// verify countries got written
 	ifstream V2CountriesInput;
-	V2CountriesInput.open(("Output/" + Configuration::getOutputName() + "/common/countries.txt").c_str());
+	V2CountriesInput.open(("output/" + Configuration::getOutputName() + "/common/countries.txt").c_str());
 	if (!V2CountriesInput.is_open())
 	{
 		LOG(LogLevel::Error) << "Could not open countries.txt";
@@ -586,7 +586,7 @@ void V2World::output() const
 #endif
 #ifdef __unix__
 		struct stat st;
-		if (stat(("Output/" + Configuration::getOutputName() + "/common/countries/" + countryFileName).c_str(), &st) == 0)
+		if (stat(("output/" + Configuration::getOutputName() + "/common/countries/" + countryFileName).c_str(), &st) == 0)
 #endif
 		{
 		}
@@ -618,10 +618,10 @@ void V2World::outputPops() const
 		if (fopen_s(&popsFile, ("Output\\" + Configuration::getOutputName() + "\\history\\pops\\1836.1.1\\" + itr->first).c_str(), "w") != 0)
 #endif
 #ifdef __unix__
-		if ((popsFile = fopen(("Output/" + Configuration::getOutputName() + "/history/pops/1836.1.1/" + itr->first).c_str(), "w")) != 0)
+		if ((popsFile = fopen(("output/" + Configuration::getOutputName() + "/history/pops/1836.1.1/" + itr->first).c_str(), "w")) == 0)
 #endif
 		{
-			LOG(LogLevel::Error) << "Could not create pops file Output/" << Configuration::getOutputName() << "/history/pops/1836.1.1/" << itr->first;
+			LOG(LogLevel::Error) << "Could not create pops file output/" << Configuration::getOutputName() << "/history/pops/1836.1.1/" << itr->first;
 			exit(-1);
 		}
 

@@ -310,8 +310,8 @@ bool V2Flags::Output() const
 	LOG(LogLevel::Debug) << "Copying flags";
 
 	// Create output folders.
-	std::string outputGraphicsFolder = "Output\\" + Configuration::getOutputName() + "\\gfx";
-	std::string outputFlagFolder = outputGraphicsFolder + "\\flags";
+	std::string outputGraphicsFolder = "output/" + Configuration::getOutputName() + "/gfx";
+	std::string outputFlagFolder = outputGraphicsFolder + "/flags";
 
 	//WinUtils::DeleteFolder(outputFlagFolder); 
 

@@ -350,21 +350,20 @@ void EU4World::readCommonCountries(istream& in, const std::string& rootPath)
 					countryLine = countryLine.substr(0, commentPos);
 				}
 				size_t equalPos	= countryLine.find('=', 3);
-//				size_t beginPos	= countryLine.find_first_not_of(' ', equalPos + 1);
-				size_t beginPos = countryLine.find('\"', equalPos + 1);
-//				size_t endPos		= countryLine.find_last_not_of(' ') + 1;
-				size_t endPos = countryLine.rfind('\"');
-				std::string fileName = countryLine.substr(beginPos + 1, endPos - beginPos - 1);
-//				if (fileName.front() == '"' && fileName.back() == '"')
-//				{
-//					fileName = fileName.substr(1, fileName.size() - 2);
-//				}
+				size_t beginPos	= countryLine.find_first_not_of(' ', equalPos + 1);
+				size_t endPos	= countryLine.find_last_not_of(" \r\n") + 1;
+				std::string fileName = countryLine.substr(beginPos, endPos - beginPos);
+				if (fileName.front() == '"' && fileName.back() == '"')
+				{
+					fileName = fileName.substr(1, fileName.size() - 2);
+				}
 				//std::replace(fileName.begin(), fileName.end(), '/', '\\');
 
 				// Parse the country file.
 				std::string path = rootPath + "/common/" + fileName;
 				size_t lastPathSeparatorPos = path.find_last_of('/');
 				std::string localFileName = path.substr(lastPathSeparatorPos + 1, string::npos);
+				cout << path + "?\n";
 				country->readFromCommonCountry(localFileName, doParseFile(path.c_str()));
 			}
 		}
